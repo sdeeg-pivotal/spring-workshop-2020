@@ -1,0 +1,40 @@
+*~
+#*
+*#
+.#*
+*.log
+git.properties
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+# Intellij
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
+
+# Maven Wrapper
+mvnw
+mvnw.cmd
+.mvnw
+maven-wrapper*
+
+# Gradle
+/build/
+/bin/
+.gradle
+
+.springBeans

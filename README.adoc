@@ -1,0 +1,54 @@
+= Spring Applications Workshop
+== Overview
+[.lead]
+This one day, hands-on, classroom style session will provide developers with experience building cloud native applications using micro service architectures, Spring Boot, and Spring Cloud. The session includes presentations, demos, and hands on labs.
+
+Below is the schedule for the workshop currently being delivered which is likely a modified 
+version of the general agenda found link:proposed-agenda.adoc[_HERE_].
+
+== Prerequisits
+
+* Clone this repo somewhere convenient
+* Install link:https://spring.io/tools[STS] (or other IDE of your choice)
+* Java 8
+* Maven
+* Cloud Foundry CLI tool: link:https://docs.pivotal.io/pivotalcf/1-10/cf-cli/install-go-cli.html[Instructions]
+
+== Schedule (Day One)
+
+10:00 AM - 10:10 AM::
+ * Welcome and Agenda
+ * Overview: Topics we're covering over the 2 days, Pivotal Cloud Foundry deployment
+10:10 AM - 10:20 AM::
+ * Session 1: Using Pivotal Cloud Foundry
+10:20 AM - 10:50 AM::
+ * Session 2: Intro to Spring Ecosystem
+ * Lab: link:labs/lab01[_Build a Boot app_]
+10:50 PM - 11:00PM::
+ * Break
+11:00 AM - 11:20 AM::
+ * Session 3: Observability
+ * Lab: link:labs/lab02[_Actuator_]
+11:20 AM - 11:50 AM::
+ * Session 4: Web:  Classic REST and intro to Reactive
+ * Lab: link:labs/lab02[_Web_]
+11:50 PM - 12:00PM::
+ * Wrap
+
+== Schedule (Day Two)
+
+10:00 AM - 10:10 AM::
+ * Review
+10:10 AM - 10:40 AM::
+ * Session 5: Spring Data
+ * Lab: link:labs/lab01[_Spring Data_]
+10:40 PM - 10:50PM::
+ * Break
+10:50 AM - 11:20 AM::
+ * Session 6: Cloud
+ * Lab: link:labs/lab02[_Cloud_]
+11:20 AM - 11:50 AM::
+ * Session 7: Security
+ * Lab: link:labs/lab02[_Security_]
+11:50 PM - 12:00PM::
+ * Wrap
