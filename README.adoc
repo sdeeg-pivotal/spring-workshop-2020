@@ -1,24 +1,21 @@
 = Spring Applications Workshop
 == Overview
 [.lead]
-This one day, hands-on, classroom style session will provide developers with experience building cloud native applications using micro service architectures, Spring Boot, and Spring Cloud. The session includes presentations, demos, and hands on labs.
-
-Below is the schedule for the workshop currently being delivered which is likely a modified 
-version of the general agenda found link:proposed-agenda.adoc[_HERE_].
+This is a workshop with two 2-hour days.  This hands-on, virtual classroom will provide developers with experience building cloud native applications using micro service architectures with Spring Boot, Spring Web/Reactive, Spring Cloud, and Spring Security. The session includes presentations, demos, and hands on labs.
 
 == Prerequisits
 
 * Clone this repo somewhere convenient
-* Install link:https://spring.io/tools[STS] (or other IDE of your choice)
-* Java 8
-* Maven
-* Cloud Foundry CLI tool: link:https://docs.pivotal.io/pivotalcf/1-10/cf-cli/install-go-cli.html[Instructions]
+* Get the Spring Tools for your Eclipse, VSCode link:https://spring.io/tools[Download] (can also use IntelliJ)
+* Java 11
+* Maven or gradle
+* Cloud Foundry CLI tool: link:https://tanzu.vmware.com/tutorials/getting-started/install-the-cf-cli[Download]
 
 == Schedule (Day One)
 
 10:00 AM - 10:10 AM::
  * Welcome and Agenda
- * Overview: Topics we're covering over the 2 days, Pivotal Cloud Foundry deployment
+ * Overview: Topics we're covering over the 2 sessions, Pivotal Cloud Foundry deployment
 10:10 AM - 10:20 AM::
  * Session 1: Using Pivotal Cloud Foundry
 10:20 AM - 10:50 AM::
