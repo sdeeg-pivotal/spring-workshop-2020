@@ -1,0 +1,59 @@
+= Spring Security
+
+== Get the project
+
+. If you haven't already, download this git repo and unpack it someplace convenient.
++
+Lab0x starter project is located here:
++
+[source, bash]
+---------------------------------------------------------------------
+cn-workshop:
+├── labs
+│   ├── lab0x
+│   │   ├── some-app
+---------------------------------------------------------------------
+
+. Create a new project with Initializer called some-app, or import the project into your editor/IDE of choice.
++
+*_STS Import Help:_*
++
+Select File > Import… Then select Maven > Existing Maven Projects. On the Import Maven Projects page, browse to the /some-project directory (e.g. workshop/labs/lab0x/some-project)
+
+== Create Something
+
+. Create a something, here's some code.
++
+[source, java]
+.Code.java
+---------------------------------------------------------------------
+package com.acme.demo;
+
+public class Code {
+  public String code = "string";
+}
+---------------------------------------------------------------------
+
+== Deploy to Application Service
+
+. Create an application manifest in the root folder
++
+. Add application metadata.  Change the name to something unique, like adding your initials.
++
+[source, yaml]
+---------------------------------------------------------------------
+---
+applications:
+- name: your-app-YOUR-INITIALS
+  memory: 1G
+  instances: 1
+  path: ./target/your-app-0.0.1-SNAPSHOT.jar
+---------------------------------------------------------------------
+
+. Push application into Cloud Foundry
++
+$ cf push
+
+. Find the URL created for your app in the health status report. Browse to your app.
+
+*Congratulations!* This finished the generic module

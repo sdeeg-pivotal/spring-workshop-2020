@@ -28,7 +28,7 @@ This is a workshop with two 2-hour days.  This hands-on, virtual classroom will 
  * Lab: link:labs/lab02[_Actuator_]
 11:20 AM - 11:50 AM::
  * Session 4: Web:  Classic REST and intro to Reactive
- * Lab: link:labs/lab02[_Web_]
+ * Lab: link:labs/lab03[_Web_]
 11:50 PM - 12:00PM::
  * Wrap
 
@@ -38,14 +38,14 @@ This is a workshop with two 2-hour days.  This hands-on, virtual classroom will 
  * Review
 10:10 AM - 10:40 AM::
  * Session 5: Spring Data
- * Lab: link:labs/lab01[_Spring Data_]
+ * Lab: link:labs/lab04[_Spring Data_]
 10:40 PM - 10:50PM::
  * Break
 10:50 AM - 11:20 AM::
  * Session 6: Cloud
- * Lab: link:labs/lab02[_Cloud_]
+ * Lab: link:labs/lab05[_Cloud_]
 11:20 AM - 11:50 AM::
  * Session 7: Security
- * Lab: link:labs/lab02[_Security_]
+ * Lab: link:labs/lab06[_Security_]
 11:50 PM - 12:00PM::
  * Wrap
