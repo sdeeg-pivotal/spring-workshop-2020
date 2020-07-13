@@ -20,15 +20,15 @@ This is a workshop with two 2-hour days.  This hands-on, virtual classroom will 
  * Session 1: Using Pivotal Cloud Foundry
 10:20 AM - 10:50 AM::
  * Session 2: Intro to Spring Ecosystem
- * Lab: link:labs/lab01[_Build a Boot app_]
+ * Lab: link:labs/build_a_boot_app[_Build a Boot app_]
 10:50 PM - 11:00PM::
  * Break
 11:00 AM - 11:20 AM::
  * Session 3: Observability
- * Lab: link:labs/lab02[_Actuator_]
+ * Lab: link:labs/actuator[_Actuator_]
 11:20 AM - 11:50 AM::
  * Session 4: Web:  Classic REST and intro to Reactive
- * Lab: link:labs/lab03[_Web_]
+ * Lab: link:labs/web_and_reactive[_Web and Reactive_]
 11:50 PM - 12:00PM::
  * Wrap
 
@@ -38,14 +38,14 @@ This is a workshop with two 2-hour days.  This hands-on, virtual classroom will 
  * Review
 10:10 AM - 10:40 AM::
  * Session 5: Spring Data
- * Lab: link:labs/lab04[_Spring Data_]
+ * Lab: link:labs/data_rest[_Spring Data Rest_]
 10:40 PM - 10:50PM::
  * Break
 10:50 AM - 11:20 AM::
  * Session 6: Cloud
- * Lab: link:labs/lab05[_Cloud_]
+ * Lab: link:labs/cloud[_Cloud_]
 11:20 AM - 11:50 AM::
  * Session 7: Security
- * Lab: link:labs/lab06[_Security_]
+ * Lab: link:labs/security[_Security_]
 11:50 PM - 12:00PM::
  * Wrap
