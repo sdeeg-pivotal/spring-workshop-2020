@@ -8,10 +8,10 @@ Lab0x starter project is located here:
 +
 [source, bash]
 ---------------------------------------------------------------------
-cn-workshop:
+spring-workshop-2020:
 ├── labs
-│   ├── lab0x
-│   │   ├── some-app
+│   ├── security
+│   │   ├── greeting-service
 ---------------------------------------------------------------------
 
 . Create a new project with Initializer called some-app, or import the project into your editor/IDE of choice.

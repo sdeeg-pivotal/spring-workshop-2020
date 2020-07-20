@@ -1,5 +1,12 @@
 = Spring Web and Reactive
 
+Spring was two primary ways of managing web based interactions in apps.  Traditional MVC/Restful Web and the newer Reactive Web.
+We've already created a basic MVC app, and in this module we'll expand on it a bit and then switch to useing Reactive Web to add
+additional interfaces.  Note:  Mixing MVC and Reactive in the same app is probably an anti-pattern.
+
+One of the main reasons to use Reactive is when you have very high scale needs.  But, there's no reason to not use Reactive if
+you just like how it works.  And there's an argument to be made that using a consistant pattern is a good idea.
+
 == Get the project
 
 . If you haven't already, download this git repo and unpack it someplace convenient.
@@ -8,10 +15,10 @@ Lab0x starter project is located here:
 +
 [source, bash]
 ---------------------------------------------------------------------
-cn-workshop:
+spring-workshop-2020:
 ├── labs
-│   ├── lab0x
-│   │   ├── some-app
+│   ├── web_and_reactive
+│   │   ├── greeting-service
 ---------------------------------------------------------------------
 
 . Create a new project with Initializer called some-app, or import the project into your editor/IDE of choice.
