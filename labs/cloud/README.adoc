@@ -1,19 +1,16 @@
 = Spring Cloud
 
-Spring Cloud is a project designed to ease the building of distributed systems by creating tools to manage
-common problems.  Among the many Spring Cloud sub-projects we'll focus on:  Config Server, Gateway, and AWS.
-
 == Get the project
 
 . If you haven't already, download this git repo and unpack it someplace convenient.
 +
-The lab starter project is located here:
+Lab0x starter project is located here:
 +
 [source, bash]
 ---------------------------------------------------------------------
 cn-workshop:
 ├── labs
-│   ├── cloud
+│   ├── lab0x
 │   │   ├── some-app
 ---------------------------------------------------------------------
 

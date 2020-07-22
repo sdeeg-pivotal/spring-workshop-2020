@@ -1,61 +1,242 @@
-= Spring Actuator
+= Enhancing Boot Application with Health, Auditing, and Metrics
 
-This module will look at Spring Actuator, how to enable it, and how to extend it.
+Spring Boot includes a number of additional features to help you monitor and manage your application when it’s pushed to production. These features are added by adding _spring-boot-starter-actuator_ to the classpath.
 
-== Get the project
+More information about these production ready features see the docs at: link:https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-features.html[Actuator Docs]
 
-. If you haven't already, download this git repo and unpack it someplace convenient.
+== Set up the Actuator
+
+The completed exercise from the last lab is the starting point for this one.
+
+. Go to your project in your IDE.  If you don't have a project already available you can use the baseline project from Building a Boot Application.
 +
-Lab0x starter project is located here:
-+
-[source, bash]
+[source,bash]
 ---------------------------------------------------------------------
 spring-workshop-2020:
 ├── labs
-│   ├── actuator
-│   │   ├── greeting-service
+│   ├── build_a_boot_app
+│       └── greeting-service-baseline
 ---------------------------------------------------------------------
 
-. Create a new project with Initializer called some-app, or import the project into your editor/IDE of choice.
+. Add the Spring Boot Actuator dependency in pom.xml
 +
-*_STS Import Help:_*
-+
-Select File > Import… Then select Maven > Existing Maven Projects. On the Import Maven Projects page, browse to the /some-project directory (e.g. workshop/labs/lab0x/some-project)
-
-== Create Something
-
-. Create a something, here's some code.
-+
-[source, java]
-.Code.java
+[source, xml]
+.pom.xml
 ---------------------------------------------------------------------
-package com.acme.demo;
-
-public class Code {
-  public String code = "string";
-}
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
 ---------------------------------------------------------------------
 
-== Deploy to Application Service
+== Open permissions to access management endpoints
 
-. Create an application manifest in the root folder
+By default the Actuator endpoints are enabled and 2 of them are exposed: health and info.  We'll add a couple more to the exposed list.
+
+. If you haven't done so, rename greeting-service/src/main/resources/application.properties to application.yml
+
+. Add the following property
 +
-. Add application metadata.  Change the name to something unique, like adding your initials.
+[source, yaml]
+.application.yml
+----
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, beans, env, configprops
+----
+
+== Launch and look at the end points
+
+. Run the application
++
+[source,bash]
+----
+$ mvn clean spring-boot:run
+----
+
+. Notice the new endpoints that are now active in the app
+
++
+Try out the following endpoints. The output is omitted here because it can be quite large:
++
+http://localhost:8080/actuator/health
++
+Returns a simple description of the applications health.
++
+http://localhost:8080/actuator/env
++
+Dumps the application’s shell environment as well as all Java system properties.
++
+http://localhost:8080/actuator/beans
++
+Dumps all of the beans in the Spring context.
++
+
+. Stop the application with CTRL-C.
+
+
+== Include Build Info
+
+. Add the following properties to application.yml
 +
 [source, yaml]
 ---------------------------------------------------------------------
----
-applications:
-- name: your-app-YOUR-INITIALS
-  memory: 1G
-  instances: 1
-  path: ./target/your-app-0.0.1-SNAPSHOT.jar
+info: # add this section
+  build:
+    artifact: @project.artifactId@
+    name: @project.name@
+    description: @project.description@
+    version: @project.version@
+---------------------------------------------------------------------
+
+. Add the plugin to mvn
++
+[source, xml]
+---------------------------------------------------------------------
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <version>2.3.1.RELEASE</version>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>build-info</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+---------------------------------------------------------------------
+
+. This will add the project’s build information to the /info endpoint. The Spring Boot plugin will cause them to automatically be replaced in the assembled JAR. 
+
+. Build and run the application:
++
+[source,bash]
+---------------------------------------------------------------------
+$ mvn clean package
+$ java -jar target/greeting-service-0.0.1-SNAPSHOT.jar
+---------------------------------------------------------------------
+
+. Browse to http://localhost:8080/info. Build information is now included. 
++
+[source,json]
+---------------------------------------------------------------------
+{
+  "build": {
+    "version": "0.0.1-SNAPSHOT",
+    "artifact": "greeting-service",
+    "name": "greeting-service",
+    "group": "com.vmware.workshop",
+    "time": "2020-07-21T22:09:40.428Z"
+  }
+}
+---------------------------------------------------------------------
+
+. Stop the application.
+
+== Health Indicators
+
+Spring Boot provides an endpoint http://localhost:8080/actuator/health that exposes various health indicators that describe the health of the given application.
+
+Normally the /health endpoint will expose simple information as below. 
+
+[source,json]
+---------------------------------------------------------------------
+{
+  "status": "UP",
+}
+---------------------------------------------------------------------
+
+Let's expand that by adding some information from our application.
+
+. Create the class _FlappingHealthIndicator_
++
+[source,java]
+.FlappingHealthIndicator.java
+---------------------------------------------------------------------
+@Component
+public class FlappingHealthIndicator implements HealthIndicator {
+
+    private Random random = new Random(System.currentTimeMillis());
+
+    @Override
+    public Health health() {
+        int result = random.nextInt(100);
+        if (result < 50) {
+            return Health.down()
+                         .withDetail("flapper", "failure")
+                         .withDetail("random", result)
+                         .build();
+        } else {
+            return Health.up()
+                         .withDetail("flapper", "ok")
+                         .withDetail("random", result)
+                         .build();
+        }
+    }
+}
+---------------------------------------------------------------------
++
+This demo health indicator will randomize the health check.
++
+. Configure actuator to show details with the /actuator/health enpoint by adding this property
++
+[source, yaml]
+---------------------------------------------------------------------
+management:
+  endpoint:
+    health:
+      show-details: always
+---------------------------------------------------------------------
+
+. Build and run the application: 
++
+[source,bash]
+---------------------------------------------------------------------
+$ mvn clean package
+$ java -jar target/greeting-service-0.0.1-SNAPSHOT.jar
+---------------------------------------------------------------------
+
+. Browse to http://localhost:8080/health and verify that the output is similar to the following (and changes randomly!). 
++
+[source,json]
+---------------------------------------------------------------------
+{
+  "status": "UP",
+  "flapping": {
+      "status": "UP",
+      "flapper": "ok",
+      "random": 42
+  },
+  "diskSpace": {
+      "status": "UP",
+      "free": 42345678945,
+      "threshold": 12345678
+  }
+}
+---------------------------------------------------------------------
++
+== Deploy to Pivotal Cloud Foundry
+. Build the application
++
+[source,bash]
+---------------------------------------------------------------------
+$ mvn clean package
 ---------------------------------------------------------------------
 
 . Push application into Cloud Foundry
 +
+[source,bash]
+---------------------------------------------------------------------
 $ cf push
+---------------------------------------------------------------------
 
-. Find the URL created for your app in the health status report. Browse to your app.
+. Find the URL created for your app in the health status report. Browse to your app.  Notice the app now shows health metrics in AppsManager.
 
-*Congratulations!* This finished the generic module
+*Congratulations!* You’ve just learned how to add health and metrics to any Spring Boot application.

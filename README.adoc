@@ -6,9 +6,9 @@ This is a workshop with two 2-hour days.  This hands-on, virtual classroom will 
 == Prerequisits
 
 * Clone this repo somewhere convenient
-* Get the Spring Tools for your Eclipse, VSCode link:https://spring.io/tools[Download] (can also use IntelliJ)
-* Java 11
-* Maven or gradle
+* Get the Spring Tools for your Eclipse, VSCode (link:https://spring.io/tools[Download])  Can also use IntelliJ.
+* Java 8
+* Maven
 * Cloud Foundry CLI tool: link:https://tanzu.vmware.com/tutorials/getting-started/install-the-cf-cli[Download]
 
 == Schedule (Day One)
@@ -17,17 +17,17 @@ This is a workshop with two 2-hour days.  This hands-on, virtual classroom will 
  * Welcome and Agenda
  * Overview: Topics we're covering over the 2 sessions, Pivotal Cloud Foundry deployment
 10:10 AM - 10:20 AM::
- * Session: Using Pivotal Cloud Foundry
+ * Session 1: Using Pivotal Cloud Foundry
 10:20 AM - 10:50 AM::
- * Session: Intro to Spring Ecosystem
+ * Session 2: Intro to Spring Ecosystem
  * Lab: link:labs/build_a_boot_app[_Build a Boot app_]
 10:50 PM - 11:00PM::
  * Break
 11:00 AM - 11:20 AM::
- * Session: Observability
+ * Session 3: Observability
  * Lab: link:labs/actuator[_Actuator_]
 11:20 AM - 11:50 AM::
- * Session: Web:  Classic REST and intro to Reactive
+ * Session 4: Web: Classic MVC and intro to Reactive Web
  * Lab: link:labs/web_and_reactive[_Web and Reactive_]
 11:50 PM - 12:00PM::
  * Wrap
@@ -37,15 +37,15 @@ This is a workshop with two 2-hour days.  This hands-on, virtual classroom will 
 10:00 AM - 10:10 AM::
  * Review
 10:10 AM - 10:40 AM::
- * Session: Spring Data
+ * Session 5: Spring Data
  * Lab: link:labs/data_rest[_Spring Data Rest_]
 10:40 PM - 10:50PM::
  * Break
 10:50 AM - 11:20 AM::
- * Session: Cloud
+ * Session 6: Spring Cloud
  * Lab: link:labs/cloud[_Cloud_]
 11:20 AM - 11:50 AM::
- * Session: Security
+ * Session 7: Spring Security
  * Lab: link:labs/security[_Security_]
 11:50 PM - 12:00PM::
  * Wrap

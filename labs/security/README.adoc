@@ -1,24 +1,22 @@
 = Spring Security
 
+Some docs at:
+link:https://docs.spring.io/spring-security/site/docs/current/reference/html5/[Spring Security Main]
+link:https://docs.spring.io/spring-security/site/docs/current/reference/html5/#mvc[Spring MVC Security]
+
 == Get the project
 
-. If you haven't already, download this git repo and unpack it someplace convenient.
+The completed exercise from the last lab is the starting point for this one.
+
+. Go to your project in your IDE.  If you don't have a project already available you can use the baseline project from Building a Boot Application.
 +
-Lab0x starter project is located here:
-+
-[source, bash]
+[source,bash]
 ---------------------------------------------------------------------
 spring-workshop-2020:
 ├── labs
-│   ├── security
-│   │   ├── greeting-service
+│   ├── build_a_boot_app
+│       └── greeting-service-baseline
 ---------------------------------------------------------------------
-
-. Create a new project with Initializer called some-app, or import the project into your editor/IDE of choice.
-+
-*_STS Import Help:_*
-+
-Select File > Import… Then select Maven > Existing Maven Projects. On the Import Maven Projects page, browse to the /some-project directory (e.g. workshop/labs/lab0x/some-project)
 
 == Create Something
 

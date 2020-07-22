@@ -1,66 +1,214 @@
 = Spring Web and Reactive
 
-Spring was two primary ways of managing web based interactions in apps.  Traditional MVC/Restful Web and the newer Reactive Web.
-We've already created a basic MVC app, and in this module we'll expand on it a bit and then switch to useing Reactive Web to add
-additional interfaces.  Note:  Mixing MVC and Reactive in the same app is probably an anti-pattern.
+Spring has to primary ways of interacting with web based calls:  MVC and Reactive.  When to use which is complex, but simply Reactive apps are
+designed to work at significant scale.  If your app doesn't need huge scale, it may not be worth adopting Reactive.  Of course, there's nothing
+wrong with using Reactive patterns even if you're not running at hyperscale.
 
-One of the main reasons to use Reactive is when you have very high scale needs.  But, there's no reason to not use Reactive if
-you just like how it works.  And there's an argument to be made that using a consistant pattern is a good idea.
+There is also being a client of an application.  Again, there are two ways.  Traditional RestTemplate and the new, reactive WebClient.
+
+This module will explore each of these.
+
+Docs are here for link:https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc[Spring MVC] and link:https://docs.spring.io/spring/docs/current/spring-framework-reference/web-reactive.html[Reactive Web]
+
+link:https://github.com/rstoyanchev/reactive-for-webmvc[Rosen Code]
 
 == Get the project
 
-. If you haven't already, download this git repo and unpack it someplace convenient.
+The completed exercise from the last lab is the starting point for this one.
+
+. Go to your project in your IDE.  If you don't have a project already available you can use the baseline project from Building a Boot Application.
 +
-Lab0x starter project is located here:
+[source,bash]
+---------------------------------------------------------------------
+spring-workshop-2020:
+├── labs
+│   ├── build_a_boot_app
+│       └── greeting-service-baseline
+---------------------------------------------------------------------
+
+== Extend the MVC Controller
+
+We'll add an "echo" endpoint that will take a Greeting and send it back prepended with "echo: " and putting the received Greeting in quotes.
+
+. Open GreetingServiceController.java
+
+. Add the echo method
 +
-[source, bash]
+[source, java]
+.GreetingServiceController.java
+---------------------------------------------------------------------
+    @PostMapping("/echo")
+    Greeting echo(@RequestBody Greeting inGreeting) {
+        return new Greeting("echo: "+inGreeting.greeting);
+    }
+---------------------------------------------------------------------
+
+.  Test with a tool that can do a POST, such as Postman or use curl
++
+----
+curl --header "Content-Type: application/json" \
+     --request POST \
+     --data '{"greeting":"hello"}' \
+     http://localhost:8080/echo
+----
+
+== Traditional Web Client
+
+When your application needs to call another web endpoint we can use RestTemplate.
+
+. Generate a RestTemplate Bean in GreetingServiceConfig
++
+[source, java]
+.GreetingServiceConfig.java
+---------------------------------------------------------------------
+    @Bean
+    RestTemplate getRestTemplate() {
+        RestTemplate restTemplate = new RestTemplate();
+        String baseUrl = "http://localhost:8080/";  //Make this a property later
+        restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(baseUrl));
+        return restTemplate;
+    }
+---------------------------------------------------------------------
+
+. Inject it into the GreetingServiceController.  The local members and the constructor will now look like this:
++
+[source, java]
+.GreetingServiceController.java
+---------------------------------------------------------------------
+    final private Greeting greeting;
+    final private RestTemplate restTemplate;
+
+    public GreetingServiceController(Greeting greeting, RestTemplate restTemplate) {
+        super();
+        this.greeting = greeting;
+        this.restTemplate = restTemplate;
+    }
+---------------------------------------------------------------------
+
+. Create an endpoint to hit to trigger the RestTemplate to call our Greeting service.  (Sure, it's a little circular, but it means
+we don't have to create any new services which is good for a workshop.)
++
+[source, java]
+.GreetingServiceController.java
+---------------------------------------------------------------------
+    @GetMapping("/rest-call")
+    Greeting restCall() {
+        Greeting returnedGreeting = restTemplate.getForObject("/greeting", Greeting.class);
+        return new Greeting("rest response: "+returnedGreeting.greeting);
+    }
+---------------------------------------------------------------------
+
+. Build and launch the app
+
+. Hit the endpoint at http://localhost:8080/rest-call
+
+== Do it Reactive
+
+Along with the other properties of Reactive programming, it is a functional way of approaching web application programming.  Because 
+of this functional orientation it is challenging to wrap your head around when you first encounter it.
+
+Choosing operators is complicated see this helpful guide link:https://projectreactor.io/docs/core/release/reference/index.html#which-operator[Which Operator]
+
+. MVC and WebFlux endpoints don't work in the same app, so there is a starter for building the same thing reactivesly.  Open it in your IDE.
++
+[source,bash]
 ---------------------------------------------------------------------
 spring-workshop-2020:
 ├── labs
 │   ├── web_and_reactive
-│   │   ├── greeting-service
+│       └── greeting-service-reactive-starter
 ---------------------------------------------------------------------
-
-. Create a new project with Initializer called some-app, or import the project into your editor/IDE of choice.
 +
-*_STS Import Help:_*
-+
-Select File > Import… Then select Maven > Existing Maven Projects. On the Import Maven Projects page, browse to the /some-project directory (e.g. workshop/labs/lab0x/some-project)
+Notice the project already contains the Greeting class, Configuration, and skeleton for the Service.
 
-== Create Something
-
-. Create a something, here's some code.
+. There are different ways to declare end points in Web Flux.  We'll explore a mechanism that uses configuration to map a route to a call into a Service.
+  The GreetingService class already as the Greeting bean wired in.  Now add a method to return it as a Mono.  This is the reactive way to create the
+  service endpoint.
 +
 [source, java]
-.Code.java
+.GreetingReactiveService.java
 ---------------------------------------------------------------------
-package com.acme.demo;
-
-public class Code {
-  public String code = "string";
-}
+    public Mono<Greeting> getGreeting() {
+        return Mono.just(new Greeting("hello, reactive"));
+    }
 ---------------------------------------------------------------------
 
-== Deploy to Application Service
-
-. Create an application manifest in the root folder
+. Update GreetingServiceConfig by generating a bean that maps the route to the service method we just created
 +
-. Add application metadata.  Change the name to something unique, like adding your initials.
-+
-[source, yaml]
+[source, java]
+.GreetingServiceConfig.java
 ---------------------------------------------------------------------
----
-applications:
-- name: your-app-YOUR-INITIALS
-  memory: 1G
-  instances: 1
-  path: ./target/your-app-0.0.1-SNAPSHOT.jar
+    @Bean
+    RouterFunction<?> routes(GreetingService greetingService) {
+        return RouterFunctions
+                .route(GET("/greeting"),
+                        serverRequest -> ServerResponse.ok().body(greetingService.getGreeting(), Greeting.class));
+    }
+---------------------------------------------------------------------
+
+. Run the app and see that the greeting endpoint works as expected.
+
+== Reactive Web Client
+
+We'll use the same trick with WebClient as we did with RestTemplate.
+
+. This time, create the WebClient bean in the GreetingService using the available Builder class injected into the constructor.
++
+[source, java]
+.GreetingService.java
+---------------------------------------------------------------------
+    final private WebClient webClient;
+    public GreetingService(WebClient.Builder builder, Greeting greeting) {
+        super();
+        this.greeting = greeting;
+        this.webClient = builder.baseUrl("http://localhost:8080").build();
+    }
+---------------------------------------------------------------------
+
+. Add the method to implement our service call
++
+[source, java]
+.GreetingService.java
+---------------------------------------------------------------------
+    public Mono<Greeting> webClientCall() {
+        return webClient.get().uri("/greeting").retrieve().bodyToMono(Greeting.class);
+    }
+---------------------------------------------------------------------
+
+. Update GreetingServiceConfig by generating a bean that maps the route to the service method we just created
++
+[source, java]
+.GreetingServiceConfig.java
+---------------------------------------------------------------------
+    @Bean
+    RouterFunction<?> routes(GreetingService greetingService) {
+        return RouterFunctions
+                .route(GET("/greeting"),
+                        serverRequest -> ServerResponse.ok().body(greetingService.getGreeting(), Greeting.class))
+                .andRoute(GET("/client-greeting"),
+                        serverRequest -> ServerResponse.ok().body(greetingService.webClientCall(), Greeting.class));
+    }
+---------------------------------------------------------------------
+
+. Run the application and see that the /client-greeting endpoint behaves as expected.
+
++
+== Deploy to Pivotal Cloud Foundry
+. Build the application
++
+[source,bash]
+---------------------------------------------------------------------
+$ mvn clean package
 ---------------------------------------------------------------------
 
 . Push application into Cloud Foundry
 +
+[source,bash]
+---------------------------------------------------------------------
 $ cf push
+---------------------------------------------------------------------
 
-. Find the URL created for your app in the health status report. Browse to your app.
+. Find the URL created for your app and browse to it.  Notice that the app works just the same to the end consumer.  You've just switched to 
+using Reactive on the backend.
 
-*Congratulations!* This finished the generic module
+*Congratulations!* This complets the introduction to Web MVC and WebFlux (Reactive Web)
