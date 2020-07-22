@@ -12,10 +12,10 @@ The Building a Spring Boot Application starter project is located here:
 +
 [source, bash]
 ---------------------------------------------------------------------
-cn-workshop:
+spring-workshop-2020:
 ├── labs
 │   ├── build_a_boot_app
-│   │   ├── greeting-service
+│   │   ├── greeting-service-starter
 ---------------------------------------------------------------------
 
 . Or ... create a new project with link:http://start.spring.io[Spring Initializer] called greeting-service.  Add the Spring Web dependency.
@@ -68,7 +68,7 @@ public class GreetingServiceConfig {
 }
 ---------------------------------------------------------------------
 
-== Set a property
+== Set a property for the greeting value
 
 Rename the existing property file from .properties to .yml to we can use YAML base properties.
 
@@ -116,7 +116,7 @@ public class GreetingServiceController {
     }
 ---------------------------------------------------------------------
 
-Completed:
+. Completed:
 +
 [source,java]
 .GreetingServiceController.java
@@ -177,7 +177,7 @@ $ mvn clean spring-boot:run
 
 . Stop the application. In the terminal window: *Ctrl + C*
 
-== Deploy to Pivotal Cloud Foundry
+== Deploy to Pivotal Application Service
 
 . Create an application manifest in the root folder
 +
@@ -195,7 +195,10 @@ applications:
 
 . Push application into Cloud Foundry
 +
+[source]
+---------------------------------------------------------------------
 $ cf push
+---------------------------------------------------------------------
 
 . Find the URL created for your app in the health status report. Browse to your app.
 

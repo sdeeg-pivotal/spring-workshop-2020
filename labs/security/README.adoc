@@ -1,57 +1,8 @@
 = Spring Security
 
+Security is a complex and many layered topic, even when just looking at the responsibilities of applications.  Here we'll explore adding Spring
+Security into our application, and look at what happens when deploying it on Pivotal Application Service.
+
 Some docs at:
 link:https://docs.spring.io/spring-security/site/docs/current/reference/html5/[Spring Security Main]
 link:https://docs.spring.io/spring-security/site/docs/current/reference/html5/#mvc[Spring MVC Security]
-
-== Get the project
-
-The completed exercise from the last lab is the starting point for this one.
-
-. Go to your project in your IDE.  If you don't have a project already available you can use the baseline project from Building a Boot Application.
-+
-[source,bash]
----------------------------------------------------------------------
-spring-workshop-2020:
-├── labs
-│   ├── build_a_boot_app
-│       └── greeting-service-baseline
----------------------------------------------------------------------
-
-== Create Something
-
-. Create a something, here's some code.
-+
-[source, java]
-.Code.java
----------------------------------------------------------------------
-package com.acme.demo;
-
-public class Code {
-  public String code = "string";
-}
----------------------------------------------------------------------
-
-== Deploy to Application Service
-
-. Create an application manifest in the root folder
-+
-. Add application metadata.  Change the name to something unique, like adding your initials.
-+
-[source, yaml]
----------------------------------------------------------------------
----
-applications:
-- name: your-app-YOUR-INITIALS
-  memory: 1G
-  instances: 1
-  path: ./target/your-app-0.0.1-SNAPSHOT.jar
----------------------------------------------------------------------
-
-. Push application into Cloud Foundry
-+
-$ cf push
-
-. Find the URL created for your app in the health status report. Browse to your app.
-
-*Congratulations!* This finished the generic module

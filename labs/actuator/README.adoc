@@ -4,7 +4,7 @@ Spring Boot includes a number of additional features to help you monitor and man
 
 More information about these production ready features see the docs at: link:https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-features.html[Actuator Docs]
 
-== Set up the Actuator
+== Set up the Actuator in the project
 
 The completed exercise from the last lab is the starting point for this one.
 
@@ -29,7 +29,7 @@ spring-workshop-2020:
 </dependency>
 ---------------------------------------------------------------------
 
-== Open permissions to access management endpoints
+== Expose some management endpoints
 
 By default the Actuator endpoints are enabled and 2 of them are exposed: health and info.  We'll add a couple more to the exposed list.
 
@@ -39,13 +39,13 @@ By default the Actuator endpoints are enabled and 2 of them are exposed: health 
 +
 [source, yaml]
 .application.yml
-----
+---------------------------------------------------------------------
 management:
   endpoints:
     web:
       exposure:
-        include: health, info, beans, env, configprops
-----
+        include: health, info, beans, env
+---------------------------------------------------------------------
 
 == Launch and look at the end points
 
@@ -221,22 +221,16 @@ $ java -jar target/greeting-service-0.0.1-SNAPSHOT.jar
   }
 }
 ---------------------------------------------------------------------
-+
-== Deploy to Pivotal Cloud Foundry
-. Build the application
+
+== Deploy to Pivotal Application Service
+. Build the application and push it
 +
 [source,bash]
 ---------------------------------------------------------------------
 $ mvn clean package
----------------------------------------------------------------------
-
-. Push application into Cloud Foundry
-+
-[source,bash]
----------------------------------------------------------------------
 $ cf push
 ---------------------------------------------------------------------
 
-. Find the URL created for your app in the health status report. Browse to your app.  Notice the app now shows health metrics in AppsManager.
+. Verify the app works as expected.  Notice the page in AppsManager now shows health metrics.
 
 *Congratulations!* You’ve just learned how to add health and metrics to any Spring Boot application.

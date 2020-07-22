@@ -24,7 +24,7 @@ This is a workshop with two 2-hour days.  This hands-on, virtual classroom will 
 10:50 PM - 11:00PM::
  * Break
 11:00 AM - 11:20 AM::
- * Session 3: Observability
+ * Session 3: Production Ready Features
  * Lab: link:labs/actuator[_Actuator_]
 11:20 AM - 11:50 AM::
  * Session 4: Web: Classic MVC and intro to Reactive Web

@@ -1,14 +1,15 @@
 = Spring Web and Reactive
 
-Spring has to primary ways of interacting with web based calls:  MVC and Reactive.  When to use which is complex, but simply Reactive apps are
-designed to work at significant scale.  If your app doesn't need huge scale, it may not be worth adopting Reactive.  Of course, there's nothing
-wrong with using Reactive patterns even if you're not running at hyperscale.
+Spring has two primary ways of interacting with web based calls:  MVC and Reactive.  When to use which is complex, but simply Reactive apps are
+designed to work at significant scale using Non-Blocking I/O and high concurrency.  If your app doesn't need huge scale, it may not be worth 
+adopting Reactive.  Of course, there's nothing wrong with using Reactive patterns even if you're not running at hyperscale.
 
-There is also being a client of an application.  Again, there are two ways.  Traditional RestTemplate and the new, reactive WebClient.
+Along with exposing endpoints, there is also the case where an application wants to act as a client to a service.  Again, there are 
+two ways.  Traditional RestTemplate and the new, reactive WebClient.
 
 This module will explore each of these.
 
-Docs are here for link:https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc[Spring MVC] and link:https://docs.spring.io/spring/docs/current/spring-framework-reference/web-reactive.html[Reactive Web]
+Docs: link:https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc[Spring MVC] and link:https://docs.spring.io/spring/docs/current/spring-framework-reference/web-reactive.html[Reactive Web]
 
 link:https://github.com/rstoyanchev/reactive-for-webmvc[Rosen Code]
 
@@ -28,7 +29,7 @@ spring-workshop-2020:
 
 == Extend the MVC Controller
 
-We'll add an "echo" endpoint that will take a Greeting and send it back prepended with "echo: " and putting the received Greeting in quotes.
+We'll add an "echo" endpoint that will take a Greeting and send it back prepended with "echo:".
 
 . Open GreetingServiceController.java
 
@@ -43,7 +44,8 @@ We'll add an "echo" endpoint that will take a Greeting and send it back prepende
     }
 ---------------------------------------------------------------------
 
-.  Test with a tool that can do a POST, such as Postman or use curl
+. Build and run the app
+. Test with a tool that can do a POST, such as Postman or use curl
 +
 ----
 curl --header "Content-Type: application/json" \
@@ -85,7 +87,7 @@ When your application needs to call another web endpoint we can use RestTemplate
     }
 ---------------------------------------------------------------------
 
-. Create an endpoint to hit to trigger the RestTemplate to call our Greeting service.  (Sure, it's a little circular, but it means
+. Create an endpoint to trigger the RestTemplate to call our Greeting service and return the result.  (Sure, it's a little circular, but it means
 we don't have to create any new services which is good for a workshop.)
 +
 [source, java]
@@ -104,12 +106,12 @@ we don't have to create any new services which is good for a workshop.)
 
 == Do it Reactive
 
-Along with the other properties of Reactive programming, it is a functional way of approaching web application programming.  Because 
-of this functional orientation it is challenging to wrap your head around when you first encounter it.
+Reactive Web is challenging to wrap your head around when you first encounter it.  You have to start thinking of the world in the basic Reactive types
+of Mono and Flux.  There are a bunch of complicated operators to understand.  And the whole approach is functional (vs imperative) in nature.
 
-Choosing operators is complicated see this helpful guide link:https://projectreactor.io/docs/core/release/reference/index.html#which-operator[Which Operator]
+MVC and WebFlux endpoints don't work in the same app, so we'll use a starter that already has some of the things we need (eg: Greeting class).  We'll add the greeting endpoints using a WebFlux style.  Then we'll look at the reactive based WebClient for making calls to other services.
 
-. MVC and WebFlux endpoints don't work in the same app, so there is a starter for building the same thing reactivesly.  Open it in your IDE.
+. Open the starter in your IDE.
 +
 [source,bash]
 ---------------------------------------------------------------------
@@ -118,7 +120,7 @@ spring-workshop-2020:
 │   ├── web_and_reactive
 │       └── greeting-service-reactive-starter
 ---------------------------------------------------------------------
-+
+
 Notice the project already contains the Greeting class, Configuration, and skeleton for the Service.
 
 . There are different ways to declare end points in Web Flux.  We'll explore a mechanism that uses configuration to map a route to a call into a Service.
@@ -152,7 +154,8 @@ Notice the project already contains the Greeting class, Configuration, and skele
 
 We'll use the same trick with WebClient as we did with RestTemplate.
 
-. This time, create the WebClient bean in the GreetingService using the available Builder class injected into the constructor.
+. This time, create the WebClient bean in the GreetingService using the available Builder class injected into the constructor.  Set the URL
+to something appropriate for your environment.
 +
 [source, java]
 .GreetingService.java
@@ -175,7 +178,7 @@ We'll use the same trick with WebClient as we did with RestTemplate.
     }
 ---------------------------------------------------------------------
 
-. Update GreetingServiceConfig by generating a bean that maps the route to the service method we just created
+. Update GreetingServiceConfig by adding a new route to the bean that maps the routes to service calls.
 +
 [source, java]
 .GreetingServiceConfig.java
@@ -192,23 +195,15 @@ We'll use the same trick with WebClient as we did with RestTemplate.
 
 . Run the application and see that the /client-greeting endpoint behaves as expected.
 
-+
-== Deploy to Pivotal Cloud Foundry
-. Build the application
+== Deploy to Pivotal Application Service
+. Build the application and push it
 +
 [source,bash]
 ---------------------------------------------------------------------
 $ mvn clean package
----------------------------------------------------------------------
-
-. Push application into Cloud Foundry
-+
-[source,bash]
----------------------------------------------------------------------
 $ cf push
 ---------------------------------------------------------------------
 
-. Find the URL created for your app and browse to it.  Notice that the app works just the same to the end consumer.  You've just switched to 
-using Reactive on the backend.
+. Verify the app works as expected.
 
 *Congratulations!* This complets the introduction to Web MVC and WebFlux (Reactive Web)
