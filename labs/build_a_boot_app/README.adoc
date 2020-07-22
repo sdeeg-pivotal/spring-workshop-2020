@@ -34,6 +34,7 @@ package com.vmware.workshop.greeting.service.dom;
 public class Greeting {
     private String greeting = "hello, world";
 
+    public Greeting() {}
     public Greeting(String greeting) {
         this.greeting = greeting;
     }
