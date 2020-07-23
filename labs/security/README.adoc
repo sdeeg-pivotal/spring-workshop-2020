@@ -4,14 +4,14 @@ Security is a complex and many layered topic, even when just looking at the resp
 Security into our application, and look at what happens when deploying it on Pivotal Application Service while making use of the Single Sign On service.
 
 Some docs at:
-+
+
 link:https://docs.spring.io/spring-security/site/docs/current/reference/html5/[Spring Security Main]
-+
+
 link:https://docs.spring.io/spring-security/site/docs/current/reference/html5/#mvc[Spring MVC Security]
-+
+
 link:https://docs.pivotal.io/p-identity/1-12/[Single Sign On Service]
-+
-link:https://docs.spring.io/spring-security/site/docs/current/reference/html5/#servlet-security-filters[Support Filters]
+
+link:https://docs.spring.io/spring-security/site/docs/current/reference/html5/#servlet-security-filters[Support Filters ]
 
 == Get the project
 
@@ -32,7 +32,7 @@ spring-workshop-2020:
 As we saw when we added the Spring Cloud Service Config Server client library to our last sample and Spring Security became enabled, the
 way to take control of security is to create our own instance of WebSecurityConfigurerAdapter and define the behavior we actually want.  Previously
 we created an empty security configuration that simply turned off the auto configuration.
-+
+
 [source,java]
 .WebSecurityConfig.java
 ---------------------------------------------------------------------
@@ -45,6 +45,82 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ---------------------------------------------------------------------
 
+. First validate that the pom contains the basic security starter
++
+.pom.xml
+[source,xml]
+---------------------------------------------------------------------
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+---------------------------------------------------------------------
+
+. Make the security configuration explicit by adding this code to the configure method
++
+[source,java]
+.WebSecurityConfig.java
+---------------------------------------------------------------------
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests().anyRequest().permitAll();
+    }
+---------------------------------------------------------------------
+
+. Re-run the application and see that everythig is still accessable.
+
+. Change this to allow requests to /greeting but require authorization for /greetings
++
+[source,java]
+.WebSecurityConfig.java
+---------------------------------------------------------------------
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests().antMatchers("/").permitAll()
+        .antMatchers("/greetings/**").authenticated()
+        .and().httpBasic();
+    }
+---------------------------------------------------------------------
+
+. Re-run the application and see that request to /greeting succeed while requests to /greetings now fail taking you to a simple
+login form in the browser (triggered by httpBasic()).  What if we wanted a fancier page?
+
+. Create a simulated login page in the static directory
++
+[source]
+---------------------------------------------------------------------
+greeting-service
+├── src
+│   ├── main
+│       └── resources
+│           └── static
+│               └── login.html
+---------------------------------------------------------------------
+
+. Add this content
++
+[source,html]
+.login.html
+---------------------------------------------------------------------
+<html>
+<body>
+This is a login page
+</body>
+</html>
+---------------------------------------------------------------------
+
+. Add a section on the configuration to take a person to a login page if they need to be authenticated.
++
+[source,java]
+.WebSecurityConfig.java
+---------------------------------------------------------------------
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests().antMatchers("/").permitAll()
+        .antMatchers("/greetings/**").authenticated()
+        .and().formLogin().loginPage("/login.html");
+    }
+---------------------------------------------------------------------
 
 == Overriding WebSecurity can get complex!
 
@@ -90,3 +166,73 @@ public class OAuth2LoginSecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ---------------------------------------------------------------------
 
+== There's an easier way with SSO
+
+For the sake of time, instead of building this part from scratch we can use one of the sample application provided by the VMware SSO team.
+
+. Load the following projects into your IDE
++
+[source]
+---------------------------------------------------------------------
+spring-workshop-2020:
+├── labs
+│   ├── security
+│       └── authcode
+
+spring-workshop-2020:
+├── labs
+│   ├── security
+│       └── resource-server
+---------------------------------------------------------------------
+
+. Create an instance of the p-identity service.  Use the marketplace to find out what plans are available to you.
++
+[source]
+---------------------------------------------------------------------
+$ cf create-service p-identity <your plan name> <your-service-instance-name>
+---------------------------------------------------------------------
+
+. Open manifest.yml for the resource-server and modify this value
+.manifest.yml
+[source,yaml]
+---------------------------------------------------------------------
+applications:
+ - name: resource-server-sample
+   env:
+     # to find issuer uri, go to auth domain's well-known endpoint (e.g.: https://<PLAN_AUTH_DOMAIN>.login.<YOUR_DOMAIN>/.well-known/openid-configuration)
+     SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUERURI: https://planet10-sso.uaa.tas.planet10.lab/oauth/token
+---------------------------------------------------------------------
+
+. Build and deploy the resoure-server
++
+[source]
+---------------------------------------------------------------------
+$ ./gradlew build
+$ cf push
+---------------------------------------------------------------------
+
+. The applications can configure themselves with SSO when they're deployed, and the mechanism we're going to use is to use Environment
+variables in manifest.yml.  Open manifest.yml in authcode and set these values to ones for your system.  Leave the rest of the defaults.
++
+.manifest.yml
+[source,yaml]
+---------------------------------------------------------------------
+applications:
+ - name: authcode-sample
+   services:
+   - <your-service>
+   env:
+     RESOURCE_URL: http://resource-server-sample.tasapps.planet10.lab  #URL for the resource-server, make sure it matched app name!
+     SSO_IDENTITY_PROVIDERS: uaa, ldap                                 #Add any Id Providers you use
+---------------------------------------------------------------------
+
+. Deploy the authcode application
++
+[source]
+---------------------------------------------------------------------
+$ ./gradlew build
+$ cf push
+---------------------------------------------------------------------
+
+. Browse to the authcode-sample app.  Click the link, you should be prompted to login.  You'll then see a big dump of information about the security
+session.  

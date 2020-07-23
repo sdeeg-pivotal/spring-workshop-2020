@@ -35,10 +35,4 @@ public class GreetingServiceConfig {
             gr.findAll().forEach(x -> logger.debug(x.toString()));
         };
     }
-
-//    @Bean
-//    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-//        http.authorizeExchange().anyExchange().permitAll();
-//        return http.build();
-//    }
 }
