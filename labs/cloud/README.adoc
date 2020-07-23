@@ -3,3 +3,175 @@
 Cloud computing brings many benefits, but also some significant challenges.  The Spring Cloud project creates tools to aid in
 operating applications in a cloud environment.  This module will explore a couple of these: distributed configuration and
 application api management via a gateway.
+
+
+Docs: link:https://spring.io/projects/spring-cloud-config[Spring Cloud Config]
+link:https://docs.pivotal.io/spring-cloud-services/3-1/common/config-server/index.html[Spring Cloud Services]
+
+== Get the project
+
+The completed exercise from the last lab is a fine starting point for this one.
+
+. Go to your project in your IDE.  If you don't have a project already available you can use the baseline project from Building a Boot Application.
++
+[source]
+---------------------------------------------------------------------
+spring-workshop-2020:
+├── labs
+│   ├── build_a_boot_app
+│       └── greeting-service-baseline
+---------------------------------------------------------------------
+
+== Create the Config Service
+
+Start by creating an instance of the config server that we can use locally.
+
+. Open the project 
++
+[source]
+---------------------------------------------------------------------
+spring-workshop-2020:
+├── labs
+│   ├── cloud
+│       └── config-server
+---------------------------------------------------------------------
+
+Notice the property for the URI of the repo is set to point to one on github.  You can use this one, or set it to point to cloned git project in your
+local directory structure as in the commented out version.
+
+. Either start the service in the IDE or build and launch it from the command line
++
+[source,bash]
+---------------------------------------------------------------------
+$ mvn clean package
+$ java -jar target/config-server-0.0.1-SNAPSHOT.jar
+---------------------------------------------------------------------
+
+. Try to access the properties for greeting-service.  Either hit the url with a browser or use curl.
++
+[source,bash]
+---------------------------------------------------------------------
+$ curl http://localhost:8888/greeting-service/maser
+{"name":"greeting-service","profiles":["maser"],"label":null,"version":"c459799543ca2c2782ba436993db9ea1891387e3","state":null,"propertySources":[{"name":"https://github.com/sdeeg-pivotal/app-config/greeting-service.yml (document #0)","source":{"app.greeting":"hello, world (git)"}},{"name":"https://github.com/sdeeg-pivotal/app-config/application.yml","source":{"message":"hello, world (application.yml git)","app.generic.prop":"generic-value"}}]}
+---------------------------------------------------------------------
+
+== Add the application as a Config Client
+
+The pom needs to be updated to include both the new dependencies as well as a Dependency Manager for the Spring Cloud project.
+
+. Add Dependency Managment to the pom.  (Note that the versions are hard coded instead of using pom properties.)
++
+.pom.xml
+[source,xml]
+---------------------------------------------------------------------
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>Hoxton.SR6</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.pivotal.spring.cloud</groupId>
+				<artifactId>spring-cloud-services-dependencies</artifactId>
+				<version>2.2.3.RELEASE</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+---------------------------------------------------------------------
+
+. Add the dependencies needed to be a config client.  Spring Security is coming along for the ride so we can configure it quickly.
++
+.pom.xml
+[source,xml]
+---------------------------------------------------------------------
+		<dependency>
+			<groupId>io.pivotal.spring.cloud</groupId>
+			<artifactId>spring-cloud-services-starter-config-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+---------------------------------------------------------------------
+
+. Create bootstrap.yml in the resources directory (right next to application.yml).  This tells the config server what app to get the config for.
++
+.bootstrap.yml
+[source,yaml]
+---------------------------------------------------------------------
+spring:
+  application:
+    name: greeting-service
+---------------------------------------------------------------------
+
+.  Create a new class, WebSecurityConfig in the config pacakge.  This will create a security profile that will allow all requests.
++
+[source, java]
+.WebSecurityConfig.java
+---------------------------------------------------------------------
+package com.vmware.workshop.greeting.service.config;
+
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+@EnableWebSecurity
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests().anyRequest().permitAll();
+    }
+}
+---------------------------------------------------------------------
+
+. With the config server running locally, run the greeting-service.  You should see a line in the log, just after the Spring banner, like this:
++
+[source, bash]
+---------------------------------------------------------------------
+2020-07-23 00:23:03.514  INFO <snip> : Fetching config from server at : http://localhost:8888
+---------------------------------------------------------------------
+
+You should be able to hit the greeting service with out being challenged to log in.
+
+== Deploy using the config server on Pivotal Application Service
+
+To deploy to PAS we need to create an instance of a Configuration Server.  We want this service to use the git backend, so we'll pass a configuration
+to it with the appropriate information.
+
+. Create a file with a JSON description of the backend repository in git to use to load the properties.
++
+[source, json]
+.config.json
+---------------------------------------------------------------------
+{ "git": { "uri": "https://github.com/sdeeg-pivotal/app-config" } }
+---------------------------------------------------------------------
+
+. Create an instance of the config server.  Use cf service to monitor it's creation progress
++
+[source,bash]
+---------------------------------------------------------------------
+$ cf create-service p.config-server standard greeting-config-server -c config.json
+$ cf service greeting-config-server
+---------------------------------------------------------------------
+
+. Add the service into manifest.yml
++
+[source, yaml]
+.manifest.yml
+---------------------------------------------------------------------
+---
+applications:
+- name: greeting-service
+  memory: 1G
+  instances: 1
+  path: ./target/greeting-service-0.0.1-SNAPSHOT.jar
+  services:
+  - greeting-config-server
+---------------------------------------------------------------------
+

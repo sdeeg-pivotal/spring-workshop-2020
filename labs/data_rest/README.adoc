@@ -2,3 +2,194 @@
 
 Data has been with us since the beginning of applications.  Spring Data brings Spring patterns to using Data services.  This module
 will look at the basics of Spring Data Rest.
+
+Docs: link:https://spring.io/projects/spring-data[Spring Data]
+
+== Get the project
+
+The completed, non-reactive exercise from the last lab is the starting point for this one.
+
+. Go to your project in your IDE.  If you don't have a project already available you can use the baseline project from Building a Boot Application.
++
+[source,bash]
+---------------------------------------------------------------------
+spring-workshop-2020:
+├── labs
+│   ├── build_a_boot_app
+│       └── greeting-service-baseline
+---------------------------------------------------------------------
+
+. Add the Spring Data dependencies in pom.xml.  Also add a couple of DB drivers so we can talk to actual data sources.
++
+[source, xml]
+.pom.xml
+---------------------------------------------------------------------
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-rest</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <scope>runtime</scope>
+</dependency>
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <scope>runtime</scope>
+</dependency>
+---------------------------------------------------------------------
+
+. Convert the Greeting class into an @Entity
++
+[source, java]
+.Greeting.java
+---------------------------------------------------------------------
+@Entity
+public class Greeting {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Integer id;
+  private String text;
+
+  public Greeting(String text) {
+    super();
+    this.text = text;
+  }
+
+  @Override
+  public String toString() {
+    return "Greeting [id=" + id + ", text=" + text + "]";
+  }
+
+  public Integer getId() {
+    return id;
+  }
+
+  public String getText() {
+    return text;
+  }
+
+  public Greeting() {}
+}
+---------------------------------------------------------------------
+
+. Create a new Interface to declare the JPA Repository that will manage the storage of our Greeting
++
+[source, java]
+.GreetingRepository.java
+---------------------------------------------------------------------
+public interface GreetingRepository extends JpaRepository<Greeting, Integer> {
+ 
+}
+---------------------------------------------------------------------
+
+. Load the repository with some intial data by creating an ApplicationRunner Bean that uses the GreetingRepository to add some new Greetings.
++
+[source, java]
+.GreetingServiceConfig.java
+---------------------------------------------------------------------
+    Logger logger = LoggerFactory.getLogger(GreetingServiceConfig.class);
+
+    // Loads the database on startup
+    @Bean
+    ApplicationRunner loadDatabase(GreetingRepository gr) {
+        return applicationRunner -> {
+            logger.info("loading database..");
+            gr.save(new Greeting("Hello"));
+            gr.save(new Greeting("Hola"));
+            gr.save(new Greeting("Ohai"));
+            logger.info("record count: {}", gr.count());
+        };
+---------------------------------------------------------------------
+
+. JPA is based on Hibernate, so let's set the Hibernate property to recreate all our data when the app start's up.
++
+[source, yaml]
+.application.yml
+---------------------------------------------------------------------
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+---------------------------------------------------------------------
+
+. Run the app!  You should see the logging for the loading of the DB and the 3 entities from the count().  Browse to http://localhost:8080/greetings
+
+== Extend the ability to search for entities
+
+We will extend the repository to allow for more advanced searching.  To prove it we will also add another Greeting entity that has the
+same text so we can see the results.
+
+. Go to the GreetingRepository and add this method to the Interface
++
+[source, java]
+.GreetingRepository.java
+---------------------------------------------------------------------
+  List<Greeting> findByText(@Param("text") String text); 
+---------------------------------------------------------------------
+
+. In GreetingServiceConfig add another entry to create a 
++
+[source, java]
+.GreetingServiceConfig.java
+---------------------------------------------------------------------
+      gr.save(new Greeting("Hello"));
+---------------------------------------------------------------------
+
+. Restart the app and hit the search endpoint http://localhost:8080/greetings/search
+
+. Try searching for Hello http://localhost:8080/greetings/search/findByText?text=Hello
+
+== Deploy to Pivotal Application Service
+. Build the application and push it
++
+[source,bash]
+---------------------------------------------------------------------
+$ mvn clean package
+$ cf push
+---------------------------------------------------------------------
+
+. Verify the app works as expected.
+
+== (Optional) Add a cloud MySQL DB
+
+. Under the Marketplace in Pivotal Application Service select the MySQL DB service.  Create an instance of it.  You can also use the cf cli
++
+[source,bash]
+---------------------------------------------------------------------
+$ cf create-service p.mysql small-db greeting-db
+---------------------------------------------------------------------
+
+. Update the app manifest to bind the greeting-service app with the new MySQL DB service
++
+[source,yaml]
+manifest.yml
+---------------------------------------------------------------------
+---
+applications:
+- name: greeting-service
+  memory: 1G
+  instances: 1
+  path: ./target/greeting-service-0.0.1-SNAPSHOT.jar
+  services:  #Array of services to bind the app to
+  - greeting-db
+
+---------------------------------------------------------------------
+
+. Either push the app again, or bind the service to it and restart.  Here is how to bind and restart at the cli:
++
+[source,bash]
+---------------------------------------------------------------------
+$ cf bind-service greeting-service greeting-db
+$ cf restart greeting-service
+---------------------------------------------------------------------
+
+*Congratulations!* You’ve just build a DB powered app that talks with a cloud managed DB.
+

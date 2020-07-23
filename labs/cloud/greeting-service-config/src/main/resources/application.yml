@@ -1,0 +1,17 @@
+app:
+  greeting: hello, world
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, beans, env
+  info:
+    build:
+      artifact: @project.artifactId@
+      name: @project.name@
+      description: @project.description@
+      version: @project.version@
+  endpoint:
+    health:
+      show-details: always

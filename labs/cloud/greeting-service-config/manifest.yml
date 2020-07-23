@@ -1,0 +1,9 @@
+---
+applications:
+- name: greeting-service
+  memory: 1G
+  instances: 1
+  path: ./target/greeting-service-0.0.1-SNAPSHOT.jar
+  services:
+  - greeting-config-server
+
