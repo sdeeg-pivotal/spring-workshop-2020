@@ -5,7 +5,7 @@ operating applications in a cloud environment.  This module will explore a coupl
 application api management via a gateway.
 
 
-Docs: link:https://spring.io/projects/spring-cloud-config[Spring Cloud Config]
+Docs: link: link:https://spring.io/projects/spring-cloud-config[Spring Cloud Config]
 link:https://docs.pivotal.io/spring-cloud-services/3-1/common/config-server/index.html[Spring Cloud Services]
 
 == Get the project
@@ -125,7 +125,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().anyRequest().permitAll();
     }
 }
 ---------------------------------------------------------------------
@@ -160,7 +159,7 @@ $ cf create-service p.config-server standard greeting-config-server -c config.js
 $ cf service greeting-config-server
 ---------------------------------------------------------------------
 
-. Add the service into manifest.yml
+. Add the service into manifest.yml so it binds when the app is deployed.
 +
 [source, yaml]
 .manifest.yml
@@ -174,4 +173,20 @@ applications:
   services:
   - greeting-config-server
 ---------------------------------------------------------------------
+
+. push the app
++
+[source,bash]
+---------------------------------------------------------------------
+$ cf push
+---------------------------------------------------------------------
+
+. Monitor the log to see that the app is connecting to the config service.  You should see an output like this
++
+[source, bash]
+---------------------------------------------------------------------
+2020-07-23T00:11:57.40-0700 <snip> : Fetching config from server at : https://config-server-a7f7b596-0e4a-4424-801c-9f8a697d6758.tasapps.planet10.lab
+---------------------------------------------------------------------
+
+. Validate that the /greeting endpoint is working and that the config comes from the git repository.
 

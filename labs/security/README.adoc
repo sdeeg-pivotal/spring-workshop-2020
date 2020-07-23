@@ -1,8 +1,92 @@
 = Spring Security
 
 Security is a complex and many layered topic, even when just looking at the responsibilities of applications.  Here we'll explore adding Spring
-Security into our application, and look at what happens when deploying it on Pivotal Application Service.
+Security into our application, and look at what happens when deploying it on Pivotal Application Service while making use of the Single Sign On service.
 
 Some docs at:
++
 link:https://docs.spring.io/spring-security/site/docs/current/reference/html5/[Spring Security Main]
++
 link:https://docs.spring.io/spring-security/site/docs/current/reference/html5/#mvc[Spring MVC Security]
++
+link:https://docs.pivotal.io/p-identity/1-12/[Single Sign On Service]
++
+link:https://docs.spring.io/spring-security/site/docs/current/reference/html5/#servlet-security-filters[Support Filters]
+
+== Get the project
+
+The completed exercise from the last lab is a fine starting point for this one.
+
+. Go to your project in your IDE.  If you don't have a project already available you can use the baseline project from Building a Boot Application.
++
+[source]
+---------------------------------------------------------------------
+spring-workshop-2020:
+├── labs
+│   ├── build_a_boot_app
+│       └── greeting-service-baseline
+---------------------------------------------------------------------
+
+== Override the default behavior
+
+As we saw when we added the Spring Cloud Service Config Server client library to our last sample and Spring Security became enabled, the
+way to take control of security is to create our own instance of WebSecurityConfigurerAdapter and define the behavior we actually want.  Previously
+we created an empty security configuration that simply turned off the auto configuration.
++
+[source,java]
+.WebSecurityConfig.java
+---------------------------------------------------------------------
+@EnableWebSecurity
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+    }
+}
+---------------------------------------------------------------------
+
+
+== Overriding WebSecurity can get complex!
+
+We've looked at some simple configuration, but it can get complex fast.  Just try reading this:
++
+[source,java]
+---------------------------------------------------------------------
+@EnableWebSecurity
+public class OAuth2LoginSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+            .oauth2Login(oauth2Login ->
+                oauth2Login
+                    .clientRegistrationRepository(this.clientRegistrationRepository())
+                    .authorizedClientRepository(this.authorizedClientRepository())
+                    .authorizedClientService(this.authorizedClientService())
+                    .loginPage("/login")
+                    .authorizationEndpoint(authorizationEndpoint ->
+                        authorizationEndpoint
+                            .baseUri(this.authorizationRequestBaseUri())
+                            .authorizationRequestRepository(this.authorizationRequestRepository())
+                            .authorizationRequestResolver(this.authorizationRequestResolver())
+                    )
+                    .redirectionEndpoint(redirectionEndpoint ->
+                         redirectionEndpoint
+                            .baseUri(this.authorizationResponseBaseUri())
+                    )
+                    .tokenEndpoint(tokenEndpoint ->
+                        tokenEndpoint
+                            .accessTokenResponseClient(this.accessTokenResponseClient())
+                    )
+                    .userInfoEndpoint(userInfoEndpoint ->
+                        userInfoEndpoint
+                            .userAuthoritiesMapper(this.userAuthoritiesMapper())
+                            .userService(this.oauth2UserService())
+                            .oidcUserService(this.oidcUserService())
+                            .customUserType(GitHubOAuth2User.class, "github")
+                    )
+            );
+    }
+}
+---------------------------------------------------------------------
+

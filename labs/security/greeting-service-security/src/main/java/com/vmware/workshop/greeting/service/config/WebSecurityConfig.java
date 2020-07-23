@@ -5,11 +5,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.stereotype.Component;
 
-@Component
+@EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().anyRequest().permitAll();
+        http.authorizeRequests().mvcMatchers("/greeting").permitAll()
+        .and().authorizeRequests().mvcMatchers("/greetings/**").authenticated()
+        .and().formLogin().loginPage("/login.html");
     }
 }

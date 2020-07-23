@@ -170,7 +170,7 @@ $ cf create-service p.mysql small-db greeting-db
 . Update the app manifest to bind the greeting-service app with the new MySQL DB service
 +
 [source,yaml]
-manifest.yml
+.manifest.yml
 ---------------------------------------------------------------------
 ---
 applications:
