@@ -170,6 +170,8 @@ public class OAuth2LoginSecurityConfig extends WebSecurityConfigurerAdapter {
 
 For the sake of time, instead of building this part from scratch we can use one of the sample application provided by the VMware SSO team.
 
+Git repo for the sample apps: link:https://github.com/pivotal-cf/identity-sample-apps[SSO Samples]
+
 . Load the following projects into your IDE
 +
 [source]

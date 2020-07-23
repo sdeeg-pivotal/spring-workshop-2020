@@ -38,11 +38,6 @@ spring-workshop-2020:
     <artifactId>h2</artifactId>
     <scope>runtime</scope>
 </dependency>
-<dependency>
-    <groupId>mysql</groupId>
-    <artifactId>mysql-connector-java</artifactId>
-    <scope>runtime</scope>
-</dependency>
 ---------------------------------------------------------------------
 
 . Convert the Greeting class into an @Entity
@@ -107,6 +102,7 @@ public interface GreetingRepository extends JpaRepository<Greeting, Integer> {
             gr.save(new Greeting("Ohai"));
             logger.info("record count: {}", gr.count());
         };
+    }
 ---------------------------------------------------------------------
 
 . JPA is based on Hibernate, so let's set the Hibernate property to recreate all our data when the app start's up.
@@ -158,7 +154,7 @@ $ cf push
 
 . Verify the app works as expected.
 
-== (Optional) Add a cloud MySQL DB
+== Add a cloud MySQL DB
 
 . Under the Marketplace in Pivotal Application Service select the MySQL DB service.  Create an instance of it.  You can also use the cf cli
 +
@@ -188,6 +184,31 @@ applications:
 [source,bash]
 ---------------------------------------------------------------------
 $ cf bind-service greeting-service greeting-db
+$ cf restart greeting-service
+---------------------------------------------------------------------
+
+== (Extra) Bind to an external Oracle DB with a User Provided Service
+
+. To bind to an Oracle DB include the drive in your pom
+
+. Create a User Provided Service like this:
++
+[source,bash]
+---------------------------------------------------------------------
+$ cf cups my-oracle-service -p "DB_URL, DB_USERNAME, DB_PASSWORD"
+
+DB_URL> jdbc:oracle:thin@<some.ipaddress>:1521:orcl
+
+DB_USERNAME> dbuser
+
+DB_PASSWORD> dbpassword
+---------------------------------------------------------------------
+
+. Either push the app again, or bind the service to it and restart.  Here is how to bind and restart at the cli:
++
+[source,bash]
+---------------------------------------------------------------------
+$ cf bind-service greeting-service my-oracle-service
 $ cf restart greeting-service
 ---------------------------------------------------------------------
 

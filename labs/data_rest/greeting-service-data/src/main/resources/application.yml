@@ -1,6 +1,11 @@
 app:
   greeting: hello, world
 
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+      
 management:
   endpoints:
     web:
