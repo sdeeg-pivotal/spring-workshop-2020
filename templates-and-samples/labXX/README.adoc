@@ -10,15 +10,12 @@ Lab0x starter project is located here:
 ---------------------------------------------------------------------
 cn-workshop:
 ├── labs
-│   ├── lab0x
+│   ├── lab-name
 │   │   ├── some-app
 ---------------------------------------------------------------------
 
 . Create a new project with Initializer called some-app, or import the project into your editor/IDE of choice.
 +
-*_STS Import Help:_*
-+
-Select File > Import… Then select Maven > Existing Maven Projects. On the Import Maven Projects page, browse to the /some-project directory (e.g. workshop/labs/lab0x/some-project)
 
 == Create Something
 
@@ -52,8 +49,13 @@ applications:
 
 . Push application into Cloud Foundry
 +
+[source, bash]
+---------------------------------------------------------------------
 $ cf push
+---------------------------------------------------------------------
 
 . Find the URL created for your app in the health status report. Browse to your app.
 
-*Congratulations!* This finished the generic module
+== #Congratulations!*
+
+You finished the generic module
